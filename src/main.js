@@ -76,10 +76,16 @@ players = remapPlayers(players, results)
 results = postMatch( [players.fred, players.aaron], [players.eric, players.dale])
 players = remapPlayers(players, results)
 
-results = postMatch( [players.chad], [players.dale])
+results = postMatch( [players.bill], [players.chad])
 players = remapPlayers(players, results)
 
 results = postMatch( [players.chad], [players.dale])
+players = remapPlayers(players, results)
+
+results = postMatch( [players.dale], [players.eric])
+players = remapPlayers(players, results)
+
+results = postMatch( [players.dale], [players.eric])
 players = remapPlayers(players, results)
 
 results = postMatch( [players.eric], [players.fred])
@@ -88,4 +94,6 @@ players = remapPlayers(players, results)
 logAll()
 
 console.log(calcWinProbability(players.aaron, players.dale))
+console.log(calcWinProbability(players.dale, players.aaron))
 console.log(calcWinProbability(players.bill, players.eric))
+console.log(calcWinProbability(players.chad, players.fred))
