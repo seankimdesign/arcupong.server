@@ -1,28 +1,25 @@
-const trueskill = require('trueskill')
+const { rate, Rating, expose } = require('ts-trueskill')
 
-const copyPlayer = ({skill, id}) => ({skill: skill.slice(), id})
-const addRank = rank => o => ({...o, rank})
-const removeRank = ({rank, ...o}) => ({...o})
-
-module.exports.postMatch = (winners, losers) => {
-  const allArrs = Array.isArray(winners) && Array.isArray(losers)
-  if (!allArrs){
-    console.error('Invalid input provided for postMatch()')
-    return
-  }
-  const winnersCopy = winners.map(copyPlayer).map(addRank(1))
-  const losersCopy = losers.map(copyPlayer).map(addRank(2))
-  const allPlayers = [...winnersCopy, ...losersCopy]
-  trueskill.AdjustPlayers(allPlayers)
-  return allPlayers.map(removeRank)
+const fixedExpose = rating => {
+  const mu = 25
+  const sigma = 25 / 3
+  const k = mu / sigma
+  return rating.mu - (k * rating.sigma)
 }
 
-module.exports.calcWinProbability = (player1, player2) => {
-  const validPlayer1 = player1 && player1.hasOwnProperty('skill') && Array.isArray(player1.skill)
-  const validPlayer2 = player2 && player2.hasOwnProperty('skill') && Array.isArray(player2.skill)
-  if (!validPlayer1 || !validPlayer2){
-    console.error('Invalid input provided for calcWinProbability()')
-    return
-  }
-  return trueskill.ChanceOfWinning(player1.skill, player2.skill)
+const getRatingObject = person => new Rating(person.mu, person.sigma)
+
+const updateRatings = updated => (person, i) => ({...person, mu: updated[i].mu, sigma: updated[i].sigma})
+
+const updateDominance = person => ({...person, dominance: fixedExpose(getRatingObject(person))})
+
+const processMatch = ([winners, losers]) => {
+  const winnersRating = winners.map(getRatingObject)
+  const losersRating = losers.map(getRatingObject)
+  const [winnersNewRating, losersNewRating] = rate([winnersRating, losersRating])
+  const winnersUpdated = winners.map(updateRatings(winnersNewRating))
+  const losersUpdated = losers.map(updateRatings(losersNewRating))
+  return [...winnersUpdated, ...losersUpdated].map(updateDominance)
 }
+
+exports.processMatch = processMatch

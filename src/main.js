@@ -1,99 +1,35 @@
-const {postMatch, calcWinProbability} = require('./rankings')
+const { processMatch } = require('./rankings')
 
-const DEFAULT_SKILL = [25, 25/3]
-
-const getNewPlayer = id => ({skill: DEFAULT_SKILL, id})
-const remapPlayers = (source, incoming) => {
-  const result = {...source}
-  incoming.forEach(i => result[i.id] = i)
-  return result
+const aaron = {
+  name: 'Aaron',
+  mu: 25,
+  sigma: 8.3333,
+  matchesPlayed: 27
+}
+const bill = {
+  name: 'Bill',
+  mu: 27,
+  sigma: 3,
+  matchesPlayed: 20
+}
+const chad = {
+  name: 'Chad',
+  mu: 16,
+  sigma: 3.6,
+  matchesPlayed: 37
+}
+const dale = {
+  name: 'Dale',
+  mu: 19,
+  sigma: 5.5,
+  matchesPlayed: 22
 }
 
-const playerNames = ['aaron', 'bill', 'chad', 'dale', 'eric', 'fred']
-let players = {}
-let results = []
-playerNames.forEach(n => players[n] = getNewPlayer(n))
+const team1 = [aaron, bill]
+const team2 = [chad, dale]
 
-const logAll = () => Object.keys(players).map(n => console.log(players[n]))
+const match = [team1, team2]
 
-results = postMatch([players.aaron, players.bill], [players.chad, players.dale])
-players = remapPlayers(players, results)
-
-results = postMatch([players.chad, players.dale], [players.aaron, players.bill])
-players = remapPlayers(players, results)
-
-results = postMatch([players.aaron, players.bill], [players.chad, players.dale])
-players = remapPlayers(players, results)
-
-results = postMatch([players.aaron, players.bill], [players.chad, players.dale])
-players = remapPlayers(players, results)
-
-results = postMatch([players.chad, players.dale], [players.aaron, players.bill])
-players = remapPlayers(players, results)
-
-results = postMatch([players.chad, players.eric], [players.dale, players.bill])
-players = remapPlayers(players, results)
-
-results = postMatch([players.chad, players.eric], [players.dale, players.bill])
-players = remapPlayers(players, results)
-
-results = postMatch([players.dale, players.bill], [players.chad, players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch([players.dale, players.bill], [players.chad, players.aaron])
-players = remapPlayers(players, results)
-
-results = postMatch([players.dale, players.bill], [players.chad, players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch([players.aaron, players.eric], [players.bill, players.chad])
-players = remapPlayers(players, results)
-
-results = postMatch([players.aaron, players.eric], [players.bill, players.chad])
-players = remapPlayers(players, results)
-
-results = postMatch([players.chad, players.eric], [players.dale, players.aaron])
-players = remapPlayers(players, results)
-
-results = postMatch([players.aaron, players.bill], [players.chad, players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch([players.aaron, players.bill], [players.chad, players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch([players.dale, players.bill], [players.aaron, players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.aaron, players.eric], [players.dale, players.bill])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.aaron, players.eric], [players.dale, players.chad])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.aaron, players.chad], [players.dale, players.bill])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.fred, players.aaron], [players.eric, players.dale])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.bill], [players.chad])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.chad], [players.dale])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.dale], [players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.dale], [players.eric])
-players = remapPlayers(players, results)
-
-results = postMatch( [players.eric], [players.fred])
-players = remapPlayers(players, results)
-
-logAll()
-
-console.log(calcWinProbability(players.aaron, players.dale))
-console.log(calcWinProbability(players.dale, players.aaron))
-console.log(calcWinProbability(players.bill, players.eric))
-console.log(calcWinProbability(players.chad, players.fred))
+const result = processMatch(match)
+console.log(result)
+console.log('From best to worst:', result.sort((a, b) => b.dominance - a.dominance).map(p => p.name))
